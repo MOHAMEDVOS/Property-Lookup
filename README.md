@@ -2,10 +2,9 @@
 
 A Chrome extension. Give it an address and it shows the Zillow and Redfin price, beds, baths, size and links side by side. On ReadyMode it reads the lead's address for you.
 
-<video src="https://github.com/MOHAMEDVOS/Property-Lookup/raw/main/brag.mp4" controls muted width="100%"></video>
+[![Watch the demo](img/demo-thumb.jpg)](https://github.com/MOHAMEDVOS/Property-Lookup/raw/main/brag.mp4)
 
-[Watch the demo](https://github.com/MOHAMEDVOS/Property-Lookup/raw/main/brag.mp4) if the player does not load.
-
+*Click the picture to watch the 30-second demo.*
 
 ## Install
 
