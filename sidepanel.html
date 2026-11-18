@@ -1,0 +1,102 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Property Lookup</title>
+<style>
+  html, body { margin:0; background:var(--bg); }
+
+  :root { --bg:#0a0a0a; --card:#111111; --soft:#1a1a1a; --t1:#ededed; --t2:#a1a1a1; --t3:#737373;
+    --line:rgba(255,255,255,0.08); --line2:rgba(255,255,255,0.14); --ok:#4ade80; --warn:#fbbf24;
+    --sans:'Geist','Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    --mono:'Geist Mono',ui-monospace,SFMono-Regular,Menlo,monospace; }
+  * { box-sizing:border-box; }
+  .panel { position:relative; height:100vh;min-width:300px; background:var(--bg); color:var(--t1); font:14px/1.45 var(--sans);
+    display:flex; flex-direction:column;
+    -webkit-font-smoothing:antialiased; }
+  form { display:flex; gap:8px; padding:10px 12px; border-bottom:1px solid var(--line); }
+  input { flex:1; min-width:0; background:var(--card); color:var(--t1); border:0; box-shadow:0 0 0 1px var(--line2);
+    border-radius:8px; padding:9px 12px; font:14px var(--sans); outline:none; }
+  input:focus { box-shadow:0 0 0 1px var(--t2), 0 0 0 4px rgba(255,255,255,0.06); }
+  input::placeholder { color:var(--t3); }
+  .pill { background:var(--t1); color:var(--bg); border:0; border-radius:999px; padding:8px 16px; cursor:pointer;
+    font:600 11px var(--mono); text-transform:uppercase; letter-spacing:0.08em; white-space:nowrap; }
+  .pill:hover { background:#fff; }
+  .pill:disabled { opacity:.5; cursor:default; }
+  .ghost { background:transparent; color:var(--t1); box-shadow:0 0 0 1px var(--line2); }
+  .ghost:hover { background:var(--soft); }
+  .body { flex:1; overflow-y:auto; padding:10px 12px 12px; display:flex; flex-direction:column; gap:10px; }
+  .body::-webkit-scrollbar { width:5px; } .body::-webkit-scrollbar-thumb { background:var(--line2); border-radius:3px; }
+  .card { flex-shrink:0; background:#ffffff; border-radius:12px; box-shadow:0 0 0 1px var(--line); overflow:hidden; }
+  .card-h { display:flex; align-items:center; gap:10px; padding:7px 12px; border-bottom:1px solid var(--line); }
+  .site { font-weight:600; letter-spacing:-0.2px; color:#ffffff; }
+  .card.zillow { --brand:#006aff; }
+  .card.redfin { --brand:#d92228; }
+  .card.lead { --brand:#16a34a; }
+  .card.lead .val { white-space:nowrap; }
+  .card-h { background:var(--brand); border-bottom:0; }
+  .card-h .pill.ghost { color:#ffffff; box-shadow:0 0 0 1px rgba(255,255,255,0.65); }
+  .card-h .pill.ghost:hover { background:rgba(255,255,255,0.18); }
+  .card-h .badge { background:rgba(255,255,255,0.2); color:#ffffff; }
+  .card .row { border-bottom-color:#ececec; }
+  .card .lbl { color:#0f1117; }
+  .card .val { color:#0f1117; }
+  .card .val a { color:#0f1117; box-shadow:inset 0 -1px 0 #c9c9c9; }
+  .card .val a:hover { box-shadow:inset 0 -1px 0 #0f1117; }
+  .card .copy { color:#0f1117; }
+  .card .copy:hover { color:#0f1117; background:#f2f2f2; }
+  .card .copy.done { color:#16a34a; }
+  .card .msg { color:#0f1117; }
+  .card .msg.warn { color:#b45309; }
+  .card .skel { background:linear-gradient(90deg,#efefef,#e2e2e2,#efefef); background-size:200% 100%; }
+  .badge { font:600 10px var(--mono); text-transform:uppercase; letter-spacing:0.08em; padding:3px 8px; border-radius:999px;
+    background:var(--soft); color:var(--t2); }
+  .badge.warn { background:rgba(251,191,36,0.12); color:var(--warn); }
+  .card-h .pill { margin-left:auto; padding:4px 10px; font-size:9.5px; }
+  .row { display:flex; align-items:center; gap:10px; padding:5px 12px; font-size:13px; line-height:1.3; border-bottom:1px solid var(--line); }
+  .row:last-child { border-bottom:0; }
+  .lbl { width:74px; flex-shrink:0; font:700 10.5px var(--mono); text-transform:uppercase; letter-spacing:0.08em; color:var(--t3); }
+  .val { flex:1; min-width:0; overflow-wrap:anywhere; font-variant-numeric:tabular-nums; }
+  .card .row.hi { background:#dcfce7; font-weight:600; }
+  .card .row.lo { background:#fee2e2; font-weight:600; }
+  .val a { color:var(--t1); text-decoration:none; box-shadow:inset 0 -1px 0 var(--line2); }
+  .val a:hover { box-shadow:inset 0 -1px 0 var(--t1); }
+  .copy { flex-shrink:0; background:none; border:0; color:var(--t3); cursor:pointer; padding:3px; border-radius:6px; display:grid; place-items:center; }
+  .copy:hover { color:var(--t1); background:var(--soft); }
+  .copy.done { color:var(--ok); }
+  .copy svg { width:15px; height:15px; }
+  .msg { padding:10px 12px; color:var(--t2); }
+  .msg.warn { color:var(--warn); }
+  .skel { height:12px; border-radius:4px; background:linear-gradient(90deg,var(--soft),#232323,var(--soft)); background-size:200% 100%;
+    animation:sh 1.2s infinite; margin:14px; }
+  @keyframes sh { to { background-position:-200% 0; } }
+  footer { flex-shrink:0; padding:6px 12px; border-top:1px solid var(--line); text-align:center;
+    font:500 10px var(--mono); text-transform:uppercase; letter-spacing:0.08em; color:var(--t3); }
+  footer a { color:var(--t1); font-weight:600; text-decoration:none; }
+  footer a:hover { text-decoration:underline; }
+  #login { position:fixed; inset:0; z-index:9; background:var(--bg,#0b0b0b); display:flex; flex-direction:column; justify-content:center; gap:10px; padding:24px; }
+  #login[hidden] { display:none; }
+  #login .msg { color:#f87171; min-height:1.2em; font-size:12px; }
+  @media (max-height:640px) { .row { padding:3px 12px; } .card-h { padding:5px 12px; } .body { gap:8px; padding-top:8px; } form { padding:8px 12px; } footer { display:none; } }
+</style>
+</head>
+<body>
+<div class="panel">
+  <form>
+    <input placeholder="123 Main St, Austin, TX 78701" aria-label="Property address" required>
+    <button class="pill">Look up</button>
+  </form>
+  <div class="body"><div class="status">Paste an address to start</div></div>
+  <footer>Developed by <a href="https://t.me/Mohmed_abdo" target="_blank" rel="noopener">Mohamed Abdo</a></footer>
+</div>
+<div id="login" hidden>
+  <form id="loginForm">
+    <input id="resId" placeholder="RES-ID" aria-label="RES-ID" autocomplete="off" required>
+    <button class="pill">Log in</button>
+  </form>
+  <div class="msg" id="loginMsg"></div>
+</div>
+<script src="sidepanel.js"></script>
+</body>
+</html>
