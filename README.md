@@ -1,3 +1,13 @@
+
+
+https://github.com/user-attachments/assets/4298f30f-1add-4913-a9de-7f6a09accf32
+
+
+
+
+
+
+
 # Property Lookup
 
 A Chrome extension. Give it an address and it shows the Zillow and Redfin price, beds, baths, size and links side by side. On ReadyMode it reads the lead's address for you.
